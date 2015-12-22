@@ -49,3 +49,21 @@ application.register('map.init', new Boxer.Map.MapProvider(
 ```
 
 See the [demo](demo/01-display-map.html).
+
+
+### Watch GeoLocation
+
+```javascript
+application.register('geo.init', new Boxer.GeoLocation.WatcherProvider(navigator));
+
+application.on('geo.success', function(geoPosition) {
+    if(this.services.geoManager) {
+        this.services.geoManager.put('me', new Boxer.GeoJson.GeoPoint(geoPosition));
+    } else {
+        console.error('application.services.geoManager not initialized');
+    }
+});
+
+```
+
+See the [demo](demo/02-watch-geolocation.html).

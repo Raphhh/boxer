@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.1/mapbox-gl.css' rel='stylesheet' />
+
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.1/mapbox-gl.js'></script>
+    <script src='../dist/boxer.js'></script>
+
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+
+</head>
+<body>
+
+<div id='map'></div>
+
+<script>
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoicmFwaGhoIiwiYSI6ImNpaTZiajRxdTAxbmlzd2txbnFzOHJhZGQifQ.fazKIAAlHZWCM2RTSjU86w';
+
+    var layers = {
+        'me': {
+            "id": "me",
+            "type": "circle",
+            "source": "me",
+            "layout": {},
+            "paint": {
+                "circle-color": "red",
+                "circle-radius": 5
+            }
+        }
+    };
+
+    var application = new Boxer.Application({logger: console});
+
+    application.on('map.ready', function(){
+        this.execute('geo.init');
+    });
+
+    application.on('geo.init', function(geoPosition) {
+        if(this.services.map) {
+            this.services.map.flyTo({
+                center: [
+                    geoPosition.coords.longitude,
+                    geoPosition.coords.latitude
+                ],
+                zoom: 12
+            });
+        } else {
+            console.error('application.services.map not initialized');
+        }
+    });
+
+    application.on('geo.success', function(geoPosition) {
+        if(this.services.geoManager) {
+            this.services.geoManager.put('me', new Boxer.GeoJson.GeoPoint(geoPosition));
+        } else {
+            console.error('application.services.geoManager not initialized');
+        }
+    });
+
+    application.register('geo.init', new Boxer.GeoLocation.WatcherProvider(navigator));
+
+    application.register('map.init', new Boxer.Map.MapProvider(
+            mapboxgl,
+            {
+                container: 'map', // container id
+                style: 'mapbox://styles/mapbox/streets-v8', //stylesheet location
+                center: [-74.50, 40], // starting position
+                zoom: 9 // starting zoom
+            },
+            layers,
+            console
+    ))();
+
+</script>
+
+</body>
+</html>

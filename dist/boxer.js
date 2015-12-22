@@ -108,6 +108,62 @@ Boxer.GeoJson = Boxer.GeoJson || {};
     'use strict';
 
     /**
+     * 
+     * @constructor
+     */
+    Boxer.GeoJson.GeoCollection = function(){
+        this.type = 'FeatureCollection';
+        this.features = [];
+    };
+
+    /**
+     * 
+     * @param {Position} geoJson
+     */
+    Boxer.GeoJson.GeoCollection.prototype.add = function(geoJson){
+        this.features.push(geoJson);
+    };
+
+})(Boxer);
+
+var Boxer = Boxer || {};
+Boxer.GeoJson = Boxer.GeoJson || {};
+
+(function(Boxer){
+    'use strict';
+
+    /**
+     *
+     * @param {Position} geoPosition
+     * @returns {{type: string, properties: {}, geometry: {type: string, coordinates: Array}}}
+     * @constructor
+     */
+    Boxer.GeoJson.GeoLine = function(geoPosition){
+
+        var mappedCoordinates = [];
+        for(var i = 0, length = geoPosition.length; i < length; ++i){
+            mappedCoordinates.push([geoPosition[i].coords.longitude, geoPosition[i].coords.latitude])
+        }
+
+        return {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+                type: 'Point',
+                coordinates: mappedCoordinates
+            }
+        };
+    };
+
+})(Boxer);
+
+var Boxer = Boxer || {};
+Boxer.GeoJson = Boxer.GeoJson || {};
+
+(function(Boxer){
+    'use strict';
+
+    /**
      *
      * @param {Boxer.Source.SourceManager} sourceManager
      * @param {Boxer.Source.SourceFactory} sourceFactory
@@ -143,6 +199,171 @@ Boxer.GeoJson = Boxer.GeoJson || {};
      */
     Boxer.GeoJson.GeoManager.prototype.put = function(id, geoJson){
         this.sourceManager.put(id, this.sourceFactory.createFromGeoJson(geoJson));
+    };
+
+})(Boxer);
+
+var Boxer = Boxer || {};
+Boxer.GeoJson = Boxer.GeoJson || {};
+
+(function(Boxer){
+    'use strict';
+
+    /**
+     *
+     * @param {Position} geoPosition
+     * @returns {{type: string, properties: {}, geometry: {type: string, coordinates: *[]}}}
+     * @constructor
+     */
+    Boxer.GeoJson.GeoPoint = function(geoPosition){
+        return {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+                type: 'Point',
+                coordinates: [geoPosition.coords.longitude, geoPosition.coords.latitude]
+            }
+        };
+    };
+
+})(Boxer);
+
+var Boxer = Boxer || {};
+Boxer.GeoLocation = Boxer.GeoLocation || {};
+
+(function(Boxer){
+    'use strict';
+
+    var cloneGeoPosition = function(geoPosition){
+        return {
+            timestamp: geoPosition.timestamp,
+            coords:{
+                accuracy:  geoPosition.coords.accuracy,
+                altitude: geoPosition.altitude,
+                altitudeAccuracy: geoPosition.altitudeAccuracy,
+                heading: geoPosition.heading,
+                latitude: geoPosition.coords.latitude,
+                longitude: geoPosition.coords.longitude,
+                speed: geoPosition.coords.speed
+            }
+        };
+    };
+
+    /**
+     *
+     * @param navigator navigator
+     * @param {object} [options]
+     * @param {{log:Function}} [logger]
+     * @constructor
+     */
+    Boxer.GeoLocation.WatcherProvider = function(navigator, options, logger){
+        this.navigator = navigator;
+        this.options = options;
+        this.logger = logger || {log:function(){}}
+    };
+
+    /**
+     *
+     * @param {Boxer.Application} application
+     */
+    Boxer.GeoLocation.WatcherProvider.prototype.execute = function(application){
+        this.logger.log('WatcherProvider.execute()', arguments);
+
+        var that = this;
+        var geoPositions = [];
+        var firstTime = true;
+
+        application.on('geo.init', function(){
+            firstTime = false;
+        });
+
+        if(that.navigator.geolocation) {
+            that.navigator.geolocation.watchPosition(
+                function(geoPosition){
+                    that.logger.log('geolocation.watchPosition.success', arguments);
+
+                    geoPosition = cloneGeoPosition(geoPosition);
+                    geoPositions.push(geoPosition);
+                    if(firstTime){
+                        application.emit('geo.init', [geoPosition]);
+                    }
+                    application.emit('geo.success', [geoPosition, geoPositions]);
+                },
+                function(positionError){
+                    that.logger.log('geolocation.watchPosition.error', arguments);
+
+                    application.emit('geo.error', [positionError]);
+                },
+                that.options
+            );
+        }else{
+            that.emit('geo.refusal');
+        }
+    };
+
+})(Boxer);
+
+var Boxer = Boxer || {};
+Boxer.Helper = Boxer.Helper || {};
+
+(function(Boxer){
+    'use strict';
+
+    /**
+     *
+     * @param {Storage} storage
+     * @param {{log:Function}} [logger]
+     * @constructor
+     */
+    Boxer.Helper.ObjectStorage = function(storage, logger){
+        this.storage = storage;
+        this.logger = logger || {log:function(){}};
+    };
+
+    /**
+     *
+     * @param key
+     * @returns {*}
+     */
+    Boxer.Helper.ObjectStorage.prototype.getItem = function(key){
+        this.logger.log('ObjectStorage.getItem()', arguments);
+        return JSON.parse(this.storage.getItem(key));
+    };
+
+    /**
+     *
+     * @param key
+     * @param object
+     */
+    Boxer.Helper.ObjectStorage.prototype.setItem = function(key, object){
+        this.logger.log('ObjectStorage.setItem()', arguments);
+        this.storage.setItem(key, JSON.stringify(object));
+    };
+
+    /**
+     *
+     * @param key
+     */
+    Boxer.Helper.ObjectStorage.prototype.removeItem = function(key){
+        this.logger.log('ObjectStorage.removeItem()', arguments);
+        this.storage.removeItem(key);
+    };
+
+    /**
+     *
+     * @param key
+     */
+    Boxer.Helper.ObjectStorage.prototype.key = function(key){
+        this.logger.log('ObjectStorage.key()', arguments);
+        this.storage.key(key);
+    };
+
+    /**
+     *
+     */
+    Boxer.Helper.ObjectStorage.prototype.clear = function(){
+        this.logger.log('ObjectStorage.clear()', arguments);
+        this.storage.clear();
     };
 
 })(Boxer);
