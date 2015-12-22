@@ -29,7 +29,7 @@ Boxer.GeoLocation = Boxer.GeoLocation || {};
     Boxer.GeoLocation.WatcherProvider = function(navigator, options, logger){
         this.navigator = navigator;
         this.options = options;
-        this.logger = logger || {log:function(){}}
+        this.logger = logger || {log:function(){}};
     };
 
     /**

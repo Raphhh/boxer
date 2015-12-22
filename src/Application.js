@@ -77,7 +77,7 @@ var Boxer = Boxer || {};
         var that = this;
         return function(args){
             provider.execute(that, args);
-        }
+        };
     };
 
     /**

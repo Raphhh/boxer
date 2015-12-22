@@ -30,7 +30,7 @@ module.exports = function(grunt) {
         },
 
         jshint: {
-            files: ['dist/boxer.js'],
+            files: ['src/**/*.js'],
             options: {
                 globals: {
                     console: true,

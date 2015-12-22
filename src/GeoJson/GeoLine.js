@@ -14,7 +14,7 @@ Boxer.GeoJson = Boxer.GeoJson || {};
 
         var mappedCoordinates = [];
         for(var i = 0, length = geoPosition.length; i < length; ++i){
-            mappedCoordinates.push([geoPosition[i].coords.longitude, geoPosition[i].coords.latitude])
+            mappedCoordinates.push([geoPosition[i].coords.longitude, geoPosition[i].coords.latitude]);
         }
 
         return {
