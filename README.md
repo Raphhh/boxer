@@ -8,7 +8,7 @@ A little framework for Mapbox GL JS
 
 After downloading le library in your project directory, include the following assets in your HTML:
 
-```
+```html
 <!-- add the mapbox assets -->
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.1/mapbox-gl.css' rel='stylesheet' />
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.1/mapbox-gl.js'></script>
@@ -28,7 +28,7 @@ After downloading le library in your project directory, include the following as
 
 ### Display a map
 
-```
+```javascript
 mapboxgl.accessToken = 'pk.eyJ1IjoicmFwaGhoIiwiYSI6ImNpaTZiajRxdTAxbmlzd2txbnFzOHJhZGQifQ.fazKIAAlHZWCM2RTSjU86w';
 
 var application = new Boxer.Application();
