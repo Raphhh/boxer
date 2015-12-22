@@ -1,5 +1,5 @@
-# boxer
-A little framework for Mapbox GL JS
+# boxer.js
+A little framework for [Mapbox GL JS](https://www.mapbox.com/mapbox-gl-js/api/)
 
 
 ## Install
