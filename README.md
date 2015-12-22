@@ -66,3 +66,20 @@ application.register('geo.init', new Boxer.GeoLocation.WatcherProvider(navigator
 ```
 
 See the [demo](demo/02-watch-geolocation.html).
+
+### Sync position with socket.io
+
+```javascript
+application.on('geo.success', function(geoPosition) {
+    if(application.services.socket){
+        console.log('emit to socket', geoPosition);
+        application.services.socket.emit('geo', geoPosition);
+    }else{
+        console.error('application.services.socket not initialized');
+    }
+});
+
+application.register('socket.init', new Boxer.Socket.SocketProvider(io, 'http://localhost:8080'))();
+```
+
+See the [demo](demo/03-socket.html).
