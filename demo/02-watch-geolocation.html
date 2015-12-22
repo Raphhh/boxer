@@ -59,9 +59,9 @@
     });
 
     application.on('geo.success', function(geoPosition) {
-        if(this.services.geoManager) {
+        if(this.services.geoManager){
             this.services.geoManager.put('me', new Boxer.GeoJson.GeoPoint(geoPosition));
-        } else {
+        }else{
             console.error('application.services.geoManager not initialized');
         }
     });
